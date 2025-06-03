@@ -169,11 +169,12 @@ export default function Index() {
                             <LanguageSelector
                                 value={targetLanguage}
                                 onValueChange={setTargetLanguage}
+                                className='flex-1'
                             />
                             <Button
                                 size='icon'
                                 variant='outline'
-                                className='!w-9'
+                                className='basis-9'
                                 onClick={() =>
                                     setLockTargetLanguage(!lockTargetLanguage)
                                 }

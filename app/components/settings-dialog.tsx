@@ -25,6 +25,7 @@ import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import useStore from '~/lib/store'
 import ModelSelector from './model-selector'
+import LanguageSelector from './language-selector'
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -133,7 +134,10 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                         <FormItem>
                             <FormLabel>Primary Language</FormLabel>
                             <FormControl>
-                                <Input placeholder='e.g., Chinese' {...field} />
+                                <LanguageSelector
+                                    {...field}
+                                    onValueChange={field.onChange}
+                                />
                             </FormControl>
                             <FormDescription>
                                 Your main language for source text.
@@ -149,7 +153,10 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                         <FormItem>
                             <FormLabel>Translation Preference</FormLabel>
                             <FormControl>
-                                <Input placeholder='e.g., English' {...field} />
+                                <LanguageSelector
+                                    {...field}
+                                    onValueChange={field.onChange}
+                                />
                             </FormControl>
                             <FormDescription>
                                 Your preferred language for translations.

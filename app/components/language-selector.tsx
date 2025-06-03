@@ -6,6 +6,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from './ui/select'
+import { ControllerRenderProps } from 'react-hook-form'
 
 const langs = [
     'Chinese',
@@ -21,12 +22,17 @@ const langs = [
     'Vietnamese',
 ]
 
-interface LanguageSelectorProps extends SelectProps {}
+interface LanguageSelectorProps extends SelectProps {
+    className?: string
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    field?: ControllerRenderProps<any, any>
+}
 
 export default function LanguageSelector(props: LanguageSelectorProps) {
+    const { className, field, ...rest } = props
     return (
-        <Select {...props}>
-            <SelectTrigger>
+        <Select {...rest} {...field}>
+            <SelectTrigger className={className}>
                 <SelectValue placeholder='Select a language' />
             </SelectTrigger>
             <SelectContent>
