@@ -4,10 +4,12 @@ import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { Settings } from 'lucide-react'
 import { SettingsButton } from '~/components/settings-dialog'
-import { useMutation } from '@tanstack/react-query'
-import { translate } from '~/lib/translate'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { detectLanguage, translate } from '~/lib/translate'
 import useStore from '~/lib/store'
 import OpenAI from 'openai'
+import { toast } from 'sonner'
+import { useDebounce } from '@uidotdev/usehooks'
 
 export const meta: MetaFunction = () => {
     return [
@@ -18,6 +20,7 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
     const [sourceText, setSourceText] = useState('')
+    const debouncedSourceText = useDebounce(sourceText, 500)
     const [targetText, setTargetText] = useState('')
 
     const store = useStore()
@@ -31,18 +34,32 @@ export default function Index() {
         [store.userPreferences.openaiBase, store.userPreferences.openaiKey],
     )
 
-    const handleTranslate = useMutation({
-        mutationFn: async () =>
-            translate({
-                text: sourceText,
+    const detectLang = useQuery({
+        queryKey: ['detectLang', debouncedSourceText],
+        queryFn: () =>
+            detectLanguage({
+                text: debouncedSourceText,
                 userPreferences: store.userPreferences,
                 client,
             }),
+        enabled: !!sourceText,
+    })
+
+    const handleTranslate = useMutation({
+        mutationFn: async () =>
+            translate(
+                {
+                    text: debouncedSourceText,
+                    userPreferences: store.userPreferences,
+                    client,
+                },
+                detectLang.data!,
+            ),
         onSuccess: data => {
             setTargetText(data || 'unknown error')
         },
         onError: err => {
-            console.error('Failed to translate text: ', err)
+            toast.error(`Failed to translate text, ${err.message}`)
         },
     })
 
@@ -52,7 +69,7 @@ export default function Index() {
             setSourceText(data)
         },
         onError: err => {
-            console.error('Failed to read clipboard contents: ', err)
+            toast.error(`Failed to read clipboard contents, ${err.message}`)
         },
     })
 
@@ -128,7 +145,7 @@ export default function Index() {
                 <div className='space-x-3'>
                     <Button
                         onClick={() => handleTranslate.mutate()}
-                        disabled={handleTranslate.isPending}
+                        disabled={!detectLang.data || handleTranslate.isPending}
                     >
                         Translate
                     </Button>

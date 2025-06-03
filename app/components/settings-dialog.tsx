@@ -24,6 +24,7 @@ import {
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
 import useStore from '~/lib/store'
+import ModelSelector from './model-selector'
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -200,35 +201,24 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                     control={form.control}
                     name='smallModel'
                     render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Small Model</FormLabel>
-                            <FormControl>
-                                <Input
-                                    placeholder='e.g., gpt-3.5-turbo'
-                                    {...field}
-                                />
-                            </FormControl>
-                            <FormDescription>
-                                The small model for translation.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
+                        <ModelSelector
+                            field={field}
+                            label='Small Model'
+                            description='The small model for translation.'
+                            defaultValue={field.value}
+                        />
                     )}
                 />
                 <FormField
                     control={form.control}
                     name='largeModel'
                     render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Large Model</FormLabel>
-                            <FormControl>
-                                <Input placeholder='e.g., gpt-4o' {...field} />
-                            </FormControl>
-                            <FormDescription>
-                                The large model for translation.
-                            </FormDescription>
-                            <FormMessage />
-                        </FormItem>
+                        <ModelSelector
+                            field={field}
+                            label='Large Model'
+                            description='The large model for translation.'
+                            defaultValue={field.value}
+                        />
                     )}
                 />
                 <DialogFooter>

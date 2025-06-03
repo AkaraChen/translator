@@ -6,10 +6,11 @@ import {
     ScrollRestoration,
 } from '@remix-run/react'
 import type { LinksFunction } from '@remix-run/node'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { Toaster } from './components/ui/sonner'
 
 import './tailwind.css'
 import './app.css'
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
 export const links: LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -42,6 +43,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <QueryClientProvider client={queryClient}>
                     {children}
                 </QueryClientProvider>
+                <Toaster />
                 <ScrollRestoration />
                 <Scripts />
             </body>

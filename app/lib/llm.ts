@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
 
-export async function llm(client: OpenAI, model: string, messages: string) {
+export async function text(client: OpenAI, model: string, messages: string) {
     const res = await client.chat.completions.create({
         model,
         messages: [{ role: 'user', content: messages }],
