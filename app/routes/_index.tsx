@@ -40,8 +40,8 @@ export default function Index() {
         <div className='container mx-auto px-4 py-8'>
             <div className='flex flex-col space-y-6'>
                 <div className='flex items-center justify-between'>
-                    <div className='flex items-baseline gap-2'>
-                        <h1 className='text-center text-3xl font-bold'>
+                    <div className='flex items-baseline gap-2 font-serif'>
+                        <h1 className='text-center text-3xl font-semibold'>
                             Translator
                         </h1>
                         <p className='hidden text-center text-muted-foreground md:block'>
@@ -49,7 +49,11 @@ export default function Index() {
                         </p>
                     </div>
                     <SettingsButton>
-                        <Button variant='ghost' size='icon' aria-label='Settings'>
+                        <Button
+                            variant='ghost'
+                            size='icon'
+                            aria-label='Settings'
+                        >
                             <Settings className='!size-5' />
                         </Button>
                     </SettingsButton>
