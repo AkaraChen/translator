@@ -34,11 +34,7 @@ export default function Index() {
     const client = useOpenAI()
 
     const detectLang = useQuery({
-        queryKey: [
-            'detectLang',
-            sourceText,
-            store.userPreferences,
-        ],
+        queryKey: ['detectLang', sourceText, store.userPreferences],
         queryFn: () =>
             detectLanguage({
                 text: sourceText,
