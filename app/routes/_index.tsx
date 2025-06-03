@@ -2,7 +2,7 @@ import { TextareaHTMLAttributes, useState } from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
-import { Settings } from 'lucide-react'
+import { Lock, LockOpen, Settings } from 'lucide-react'
 import { SettingsButton } from '~/components/settings-dialog'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { detectLanguage, translate } from '~/lib/translate'
@@ -12,6 +12,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useCompositionInput } from 'foxact/use-composition-input'
 import { useClipboard } from 'foxact/use-clipboard'
 import { useOpenAI } from '~/requests/openai'
+import LanguageSelector from '~/components/language-selector'
 
 export const meta: MetaFunction = () => {
     return [
@@ -29,9 +30,12 @@ export default function Index() {
             toast.error(`Failed to copy text, ${error.message}`)
         },
     })
-
     const store = useStore()
     const client = useOpenAI()
+    const [targetLanguage, setTargetLanguage] = useState(
+        store.userPreferences.targetLanguage,
+    )
+    const [lockTargetLanguage, setLockTargetLanguage] = useState(false)
 
     const detectLang = useQuery({
         queryKey: ['detectLang', sourceText, store.userPreferences],
@@ -50,6 +54,7 @@ export default function Index() {
             sourceText,
             detectLang.data,
             store.userPreferences,
+            targetLanguage,
         ],
         queryFn: async () =>
             translate(
@@ -59,7 +64,12 @@ export default function Index() {
                     client,
                 },
                 detectLang.data!,
-            ),
+                targetLanguage,
+            ).finally(() => {
+                if (!lockTargetLanguage) {
+                    setTargetLanguage(store.userPreferences.targetLanguage)
+                }
+            }),
         enabled: !!detectLang.data && !!sourceText,
     })
 
@@ -98,7 +108,7 @@ export default function Index() {
 
                 <div className='flex flex-col gap-4 md:flex-row'>
                     {/* Source text area - left side */}
-                    <div className='w-full md:w-1/2'>
+                    <div className='w-full space-y-4 md:w-1/2'>
                         <div className='flex flex-col space-y-2'>
                             <label
                                 htmlFor='source'
@@ -116,10 +126,24 @@ export default function Index() {
                                 defaultValue={sourceText}
                             />
                         </div>
+                        <div className='space-x-3'>
+                            <Button
+                                disabled={!handleTranslate.data}
+                                onClick={() => copy(handleTranslate.data!)}
+                            >
+                                Copy
+                            </Button>
+                            <Button
+                                variant='outline'
+                                onClick={() => handlePaste.mutate()}
+                            >
+                                Paste
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Target text area - right side */}
-                    <div className='w-full md:w-1/2'>
+                    <div className='w-full space-y-4 md:w-1/2'>
                         <div className='flex flex-col space-y-2'>
                             <label
                                 htmlFor='target'
@@ -141,23 +165,23 @@ export default function Index() {
                                 readOnly
                             />
                         </div>
+                        <div className='flex items-center space-x-3'>
+                            <LanguageSelector
+                                value={targetLanguage}
+                                onValueChange={setTargetLanguage}
+                            />
+                            <Button
+                                size='icon'
+                                variant='outline'
+                                className='!w-9'
+                                onClick={() =>
+                                    setLockTargetLanguage(!lockTargetLanguage)
+                                }
+                            >
+                                {lockTargetLanguage ? <Lock /> : <LockOpen />}
+                            </Button>
+                        </div>
                     </div>
-                </div>
-
-                {/* Buttons row */}
-                <div className='space-x-3'>
-                    <Button
-                        disabled={!handleTranslate.data}
-                        onClick={() => copy(handleTranslate.data!)}
-                    >
-                        Copy
-                    </Button>
-                    <Button
-                        variant='outline'
-                        onClick={() => handlePaste.mutate()}
-                    >
-                        Paste
-                    </Button>
                 </div>
             </div>
         </div>
