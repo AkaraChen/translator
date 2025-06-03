@@ -1,9 +1,13 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { Settings } from 'lucide-react'
 import { SettingsButton } from '~/components/settings-dialog'
+import { useMutation } from '@tanstack/react-query'
+import { translate } from '~/lib/translate'
+import useStore from '~/lib/store'
+import OpenAI from 'openai'
 
 export const meta: MetaFunction = () => {
     return [
@@ -16,20 +20,41 @@ export default function Index() {
     const [sourceText, setSourceText] = useState('')
     const [targetText, setTargetText] = useState('')
 
-    const handleTranslate = () => {
-        // In a real app, this would call a translation API
-        // For now, we'll just do a simple mock translation
-        setTargetText(sourceText.split('').reverse().join(''))
-    }
+    const store = useStore()
+    const client = useMemo(
+        () =>
+            new OpenAI({
+                baseURL: store.userPreferences.openaiBase,
+                apiKey: store.userPreferences.openaiKey,
+                dangerouslyAllowBrowser: true,
+            }),
+        [store.userPreferences.openaiBase, store.userPreferences.openaiKey],
+    )
 
-    const handlePaste = async () => {
-        try {
-            const text = await navigator.clipboard.readText()
-            setSourceText(text)
-        } catch (err) {
+    const handleTranslate = useMutation({
+        mutationFn: async () =>
+            translate({
+                text: sourceText,
+                userPreferences: store.userPreferences,
+                client,
+            }),
+        onSuccess: data => {
+            setTargetText(data)
+        },
+        onError: err => {
+            console.error('Failed to translate text: ', err)
+        },
+    })
+
+    const handlePaste = useMutation({
+        mutationFn: () => navigator.clipboard.readText(),
+        onSuccess: data => {
+            setSourceText(data)
+        },
+        onError: err => {
             console.error('Failed to read clipboard contents: ', err)
-        }
-    }
+        },
+    })
 
     const handleClear = () => {
         setSourceText('')
@@ -101,8 +126,13 @@ export default function Index() {
 
                 {/* Buttons row */}
                 <div className='space-x-3'>
-                    <Button onClick={handleTranslate}>Translate</Button>
-                    <Button variant='outline' onClick={handlePaste}>
+                    <Button onClick={() => handleTranslate.mutate()}>
+                        Translate
+                    </Button>
+                    <Button
+                        variant='outline'
+                        onClick={() => handlePaste.mutate()}
+                    >
                         Paste
                     </Button>
                     <Button variant='secondary' onClick={handleClear}>

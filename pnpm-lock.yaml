@@ -28,6 +28,9 @@ importers:
             '@remix-run/serve':
                 specifier: ^2.16.8
                 version: 2.16.8(typescript@5.8.3)
+            '@tanstack/react-query':
+                specifier: ^5.80.0
+                version: 5.80.0(react@18.3.1)
             class-variance-authority:
                 specifier: ^0.7.1
                 version: 0.7.1
@@ -40,6 +43,9 @@ importers:
             lucide-react:
                 specifier: ^0.511.0
                 version: 0.511.0(react@18.3.1)
+            openai:
+                specifier: ^5.0.2
+                version: 5.0.2(zod@3.25.49)
             react:
                 specifier: ^18.2.0
                 version: 18.3.1
@@ -58,6 +64,9 @@ importers:
             zod:
                 specifier: ^3.25.49
                 version: 3.25.49
+            zustand:
+                specifier: ^5.0.5
+                version: 5.0.5(@types/react@18.3.23)(react@18.3.1)
         devDependencies:
             '@remix-run/dev':
                 specifier: ^2.16.8
@@ -1718,6 +1727,20 @@ packages:
             {
                 integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==,
             }
+
+    '@tanstack/query-core@5.80.0':
+        resolution:
+            {
+                integrity: sha512-9a7xZv6W4R2GPlg+OYtskztGJbZ4aeQt/H4aNA5eAGtA/1hv46Et6RDN8050zmssJwoj4nclXmJY0npBV4xXrg==,
+            }
+
+    '@tanstack/react-query@5.80.0':
+        resolution:
+            {
+                integrity: sha512-GsykJqLf3v3JIIE+OPPJWl9A8imusrsCJNYkweZj4egYUpw7kWpzvgqGX4URD1d3bxIgTb8O6FBUnHu4P/f6jg==,
+            }
+        peerDependencies:
+            react: ^18 || ^19
 
     '@tybys/wasm-util@0.9.0':
         resolution:
@@ -5068,6 +5091,21 @@ packages:
             }
         engines: { node: '>=6' }
 
+    openai@5.0.2:
+        resolution:
+            {
+                integrity: sha512-NN7LAAImgBmd4RIe6WyRpLmwCbn+HQ1iaXeIG7K9DM3Auy/G2waKFhrDfRgaEeY0UUPnm6nohaCsqcS+zO8+2g==,
+            }
+        hasBin: true
+        peerDependencies:
+            ws: ^8.18.0
+            zod: ^3.23.8
+        peerDependenciesMeta:
+            ws:
+                optional: true
+            zod:
+                optional: true
+
     optionator@0.9.4:
         resolution:
             {
@@ -6959,6 +6997,27 @@ packages:
                 integrity: sha512-JMMPMy9ZBk3XFEdbM3iL1brx4NUSejd6xr3ELrrGEfGb355gjhiAWtG3K5o+AViV/3ZfkIrCzXsZn6SbLwTR8Q==,
             }
 
+    zustand@5.0.5:
+        resolution:
+            {
+                integrity: sha512-mILtRfKW9xM47hqxGIxCv12gXusoY/xTSHBYApXozR0HmQv299whhBeeAcRy+KrPPybzosvJBCOmVjq6x12fCg==,
+            }
+        engines: { node: '>=12.20.0' }
+        peerDependencies:
+            '@types/react': '>=18.0.0'
+            immer: '>=9.0.6'
+            react: '>=18.0.0'
+            use-sync-external-store: '>=1.2.0'
+        peerDependenciesMeta:
+            '@types/react':
+                optional: true
+            immer:
+                optional: true
+            react:
+                optional: true
+            use-sync-external-store:
+                optional: true
+
     zwitch@2.0.4:
         resolution:
             {
@@ -7923,6 +7982,13 @@ snapshots:
     '@rtsao/scc@1.1.0': {}
 
     '@standard-schema/utils@0.3.0': {}
+
+    '@tanstack/query-core@5.80.0': {}
+
+    '@tanstack/react-query@5.80.0(react@18.3.1)':
+        dependencies:
+            '@tanstack/query-core': 5.80.0
+            react: 18.3.1
 
     '@tybys/wasm-util@0.9.0':
         dependencies:
@@ -10264,6 +10330,10 @@ snapshots:
         dependencies:
             mimic-fn: 2.1.0
 
+    openai@5.0.2(zod@3.25.49):
+        optionalDependencies:
+            zod: 3.25.49
+
     optionator@0.9.4:
         dependencies:
             deep-is: 0.1.4
@@ -11508,5 +11578,10 @@ snapshots:
     yocto-queue@0.1.0: {}
 
     zod@3.25.49: {}
+
+    zustand@5.0.5(@types/react@18.3.23)(react@18.3.1):
+        optionalDependencies:
+            '@types/react': 18.3.23
+            react: 18.3.1
 
     zwitch@2.0.4: {}

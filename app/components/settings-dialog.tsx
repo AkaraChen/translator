@@ -23,6 +23,7 @@ import {
 } from '~/components/ui/form'
 import { Input } from '~/components/ui/input'
 import { Button } from '~/components/ui/button'
+import useStore from '~/lib/store'
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -38,6 +39,15 @@ const formSchema = z.object({
     openaiKey: z.string().min(1, {
         message: 'API key is required.',
     }),
+    smallModel: z.string().min(1, {
+        message: 'Small model is required.',
+    }),
+    largeModel: z.string().min(1, {
+        message: 'Large model is required.',
+    }),
+    alternativeLanguages: z.array(z.string()).min(1, {
+        message: 'At least one alternative language is required.',
+    }),
 })
 
 // Define the type for our form values
@@ -47,12 +57,14 @@ type FormValues = z.infer<typeof formSchema>
 const defaultValues: Partial<FormValues> = {
     primaryLanguage: 'Chinese',
     targetLanguage: 'English',
+    alternativeLanguages: ['French', 'Japanese'],
     openaiBase: 'https://api.openai.com/v1',
     openaiKey: '',
 }
 
 export function SettingsDialog() {
     const [open, setOpen] = useState(false)
+    const { setUserPreferences } = useStore()
 
     // Initialize the form
     const form = useForm<FormValues>({
@@ -61,12 +73,10 @@ export function SettingsDialog() {
     })
 
     // Handle form submission
-    function onSubmit(data: FormValues) {
-        // Save settings to localStorage or state management
-        localStorage.setItem('translatorSettings', JSON.stringify(data))
-        console.log('Settings saved:', data)
+    const onSubmit = form.handleSubmit(data => {
+        setUserPreferences(data)
         setOpen(false)
-    }
+    }, console.error)
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -82,10 +92,7 @@ export function SettingsDialog() {
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className='space-y-4 py-4'
-                    >
+                    <form onSubmit={onSubmit} className='space-y-4 py-4'>
                         <FormField
                             control={form.control}
                             name='primaryLanguage'
@@ -162,6 +169,44 @@ export function SettingsDialog() {
                                     <FormDescription>
                                         Your OpenAI API key for translation
                                         services.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name='smallModel'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Small Model</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder='e.g., gpt-3.5-turbo'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        The small model for translation.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name='largeModel'
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Large Model</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                            placeholder='e.g., gpt-4o'
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        The large model for translation.
                                     </FormDescription>
                                     <FormMessage />
                                 </FormItem>

@@ -9,6 +9,7 @@ import type { LinksFunction } from '@remix-run/node'
 
 import './tailwind.css'
 import './app.css'
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 
 export const links: LinksFunction = () => [
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -23,6 +24,8 @@ export const links: LinksFunction = () => [
     },
 ]
 
+const queryClient = new QueryClient()
+
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
         <html lang='en'>
@@ -36,7 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Links />
             </head>
             <body className='font-sans'>
-                {children}
+                <QueryClientProvider client={queryClient}>
+                    {children}
+                </QueryClientProvider>
                 <ScrollRestoration />
                 <Scripts />
             </body>
