@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
+import { Settings } from 'lucide-react'
 
 export const meta: MetaFunction = () => {
     return [
@@ -37,13 +38,18 @@ export default function Index() {
     return (
         <div className='container mx-auto px-4 py-8'>
             <div className='flex flex-col space-y-6'>
-                <div className='flex items-baseline gap-2'>
-                    <h1 className='text-center text-3xl font-bold'>
-                        Translator
-                    </h1>
-                    <p className='text-center text-muted-foreground'>
-                        A simple translation tool
-                    </p>
+                <div className='flex items-center justify-between'>
+                    <div className='flex items-baseline gap-2'>
+                        <h1 className='text-center text-3xl font-bold'>
+                            Translator
+                        </h1>
+                        <p className='hidden text-center text-muted-foreground md:block'>
+                            A simple translation tool
+                        </p>
+                    </div>
+                    <Button variant='ghost' size='icon' aria-label='Settings'>
+                        <Settings className='!size-5' />
+                    </Button>
                 </div>
 
                 <div className='flex flex-col gap-4 md:flex-row'>
