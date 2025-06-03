@@ -16,12 +16,7 @@ export default {
                     'Segoe UI Symbol',
                     'Noto Color Emoji',
                 ],
-                serif: [
-                    'Bricolage Grotesque',
-                    'ui-serif',
-                    'georgia',
-                    'serif',
-                ],
+                serif: ['Bricolage Grotesque', 'ui-serif', 'georgia', 'serif'],
             },
             borderRadius: {
                 lg: 'var(--radius)',
