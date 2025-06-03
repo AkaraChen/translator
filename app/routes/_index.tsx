@@ -53,9 +53,9 @@ export default function Index() {
             sourceText,
             detectLang.data,
             store.userPreferences,
-            targetLanguage,
+            targetLanguage === auto ? undefined : targetLanguage,
         ],
-        queryFn: async () =>
+        queryFn: () =>
             translate(
                 {
                     text: sourceText,
@@ -64,11 +64,7 @@ export default function Index() {
                 },
                 detectLang.data!,
                 targetLanguage === auto ? undefined : targetLanguage,
-            ).finally(() => {
-                if (!lockTargetLanguage) {
-                    setTargetLanguage(auto)
-                }
-            }),
+            ),
         enabled: !!detectLang.data && !!sourceText,
     })
 
@@ -171,7 +167,13 @@ export default function Index() {
                                         ? 'auto'
                                         : targetLanguage
                                 }
-                                onValueChange={setTargetLanguage}
+                                onValueChange={value => {
+                                    if (value === 'auto') {
+                                        setTargetLanguage(auto)
+                                    } else {
+                                        setTargetLanguage(value)
+                                    }
+                                }}
                                 className='w-32'
                                 disabled={
                                     detectLang.isLoading ||
