@@ -1,5 +1,5 @@
 {
-    "name": "transformer",
+    "name": "translator",
     "private": true,
     "sideEffects": false,
     "type": "module",
