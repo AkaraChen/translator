@@ -12,7 +12,9 @@
         "format": "prettier --write ."
     },
     "dependencies": {
+        "@hookform/resolvers": "^5.0.1",
         "@radix-ui/react-dialog": "^1.1.14",
+        "@radix-ui/react-label": "^2.1.7",
         "@radix-ui/react-slot": "^1.2.3",
         "@remix-run/node": "^2.16.8",
         "@remix-run/react": "^2.16.8",
@@ -23,8 +25,10 @@
         "lucide-react": "^0.511.0",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
+        "react-hook-form": "^7.57.0",
         "tailwind-merge": "^3.3.0",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "zod": "^3.25.49"
     },
     "devDependencies": {
         "@remix-run/dev": "^2.16.8",
