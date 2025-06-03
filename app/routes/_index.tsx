@@ -39,7 +39,7 @@ export default function Index() {
                 client,
             }),
         onSuccess: data => {
-            setTargetText(data)
+            setTargetText(data || 'unknown error')
         },
         onError: err => {
             console.error('Failed to translate text: ', err)
@@ -126,7 +126,10 @@ export default function Index() {
 
                 {/* Buttons row */}
                 <div className='space-x-3'>
-                    <Button onClick={() => handleTranslate.mutate()}>
+                    <Button
+                        onClick={() => handleTranslate.mutate()}
+                        disabled={handleTranslate.isPending}
+                    >
                         Translate
                     </Button>
                     <Button

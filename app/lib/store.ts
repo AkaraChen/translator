@@ -1,4 +1,6 @@
-import { create } from 'zustand'
+import { createStore } from 'zustand/vanilla'
+import { persist } from 'zustand/middleware'
+import { useStore as useZustand } from 'zustand'
 
 export interface UserPreferences {
     primaryLanguage: string
@@ -15,19 +17,28 @@ export interface Store {
     setUserPreferences: (userPreferences: UserPreferences) => void
 }
 
-const useStore = create<Store>(set => ({
-    userPreferences: {
-        primaryLanguage: 'Chinese',
-        targetLanguage: 'English',
-        alternativeLanguages: ['French', 'Japanese'],
-        openaiBase: 'https://api.openai.com/v1',
-        openaiKey: '',
-        smallModel: 'gpt-3.5-turbo',
-        largeModel: 'gpt-4o',
-    },
-    setUserPreferences: (userPreferences: UserPreferences) => {
-        set({ userPreferences })
-    },
-}))
+const store = createStore(
+    persist<Store>(
+        set => ({
+            userPreferences: {
+                primaryLanguage: 'Chinese',
+                targetLanguage: 'English',
+                alternativeLanguages: ['French', 'Japanese'],
+                openaiBase: 'https://api.openai.com/v1',
+                openaiKey: '',
+                smallModel: 'gpt-3.5-turbo',
+                largeModel: 'gpt-4o',
+            },
+            setUserPreferences: (userPreferences: UserPreferences) => {
+                set({ userPreferences })
+            },
+        }),
+        {
+            name: 'user-preferences',
+        },
+    ),
+)
+
+const useStore = () => useZustand(store)
 
 export default useStore

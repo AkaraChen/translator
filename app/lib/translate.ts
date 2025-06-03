@@ -1,5 +1,6 @@
 import { UserPreferences } from './store'
 import { OpenAI } from 'openai'
+import { llm } from './llm'
 
 export interface TranslateParams {
     text: string
@@ -9,14 +10,14 @@ export interface TranslateParams {
 
 async function detectLanguage(opts: TranslateParams) {
     const { text, userPreferences, client } = opts
-    const res = await client.responses.create({
-        input: `Detect the language of the following text: ${text}, 
+    return await llm(
+        client,
+        userPreferences.smallModel,
+        `Detect the language of the following text: ${text}, 
         if the text is in ${userPreferences.primaryLanguage}, 
         return ${userPreferences.primaryLanguage}, 
-        do not output any other text`,
-        model: userPreferences.smallModel,
-    })
-    return res.output_text
+        do not output any other text, for example: ${userPreferences.primaryLanguage}`,
+    )
 }
 
 async function translateToTargetLanguage(
@@ -26,13 +27,13 @@ async function translateToTargetLanguage(
     opts: TranslateParams,
 ) {
     const { client } = opts
-    const res = await client.responses.create({
-        input: `Translate the following ${sourceLang} text to ${targetLang}: ${text}, 
+    return await llm(
+        client,
+        opts.userPreferences.largeModel,
+        `Translate the following ${sourceLang} text to ${targetLang}: ${text}, 
         only output the translated text, 
-        do not output any other text`,
-        model: opts.userPreferences.largeModel,
-    })
-    return res.output_text
+        do not output any other text, for example: ${text}`,
+    )
 }
 
 export async function translate(
@@ -40,17 +41,23 @@ export async function translate(
     targetLanguage?: string,
 ) {
     const { text, userPreferences } = opts
-    const targetLang = targetLanguage || userPreferences.targetLanguage
-    const sourceLang = await detectLanguage(opts)
+    const sourceLang = (await detectLanguage(opts)) || 'unknown'
     if (sourceLang === userPreferences.primaryLanguage) {
+        console.log('is mother language')
         // is mother language, try to translate to target language
         return await translateToTargetLanguage(
             text,
             sourceLang,
-            targetLang,
+            targetLanguage || userPreferences.targetLanguage,
             opts,
         )
     }
+    console.log('is not mother language')
     // is not mother language, try to translate to mother language
-    return await translateToTargetLanguage(text, sourceLang, targetLang, opts)
+    return await translateToTargetLanguage(
+        text,
+        sourceLang,
+        targetLanguage || userPreferences.primaryLanguage,
+        opts,
+    )
 }

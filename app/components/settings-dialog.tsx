@@ -60,166 +60,8 @@ const defaultValues: Partial<FormValues> = {
     alternativeLanguages: ['French', 'Japanese'],
     openaiBase: 'https://api.openai.com/v1',
     openaiKey: '',
-}
-
-export function SettingsDialog() {
-    const [open, setOpen] = useState(false)
-    const { setUserPreferences } = useStore()
-
-    // Initialize the form
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
-        defaultValues,
-    })
-
-    // Handle form submission
-    const onSubmit = form.handleSubmit(data => {
-        setUserPreferences(data)
-        setOpen(false)
-    }, console.error)
-
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                {/* The trigger button will be passed as a child from the parent component */}
-                <span />
-            </DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
-                <DialogHeader>
-                    <DialogTitle>Settings</DialogTitle>
-                    <DialogDescription>
-                        Configure your translation preferences and API settings.
-                    </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                    <form onSubmit={onSubmit} className='space-y-4 py-4'>
-                        <FormField
-                            control={form.control}
-                            name='primaryLanguage'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Primary Language</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='e.g., Chinese'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        Your main language for source text.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='targetLanguage'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>
-                                        Translation Preference
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='e.g., English'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        Your preferred language for
-                                        translations.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='openaiBase'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>OpenAI Base URL</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='https://api.openai.com/v1'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        The base URL for OpenAI API requests.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='openaiKey'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>OpenAI API Key</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type='password'
-                                            placeholder='Your API key'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        Your OpenAI API key for translation
-                                        services.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='smallModel'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Small Model</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='e.g., gpt-3.5-turbo'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        The small model for translation.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name='largeModel'
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Large Model</FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder='e.g., gpt-4o'
-                                            {...field}
-                                        />
-                                    </FormControl>
-                                    <FormDescription>
-                                        The large model for translation.
-                                    </FormDescription>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <DialogFooter>
-                            <Button type='submit'>Save changes</Button>
-                        </DialogFooter>
-                    </form>
-                </Form>
-            </DialogContent>
-        </Dialog>
-    )
+    smallModel: 'gpt-3.5-turbo',
+    largeModel: 'gpt-4o',
 }
 
 // This component is used to open the settings dialog from any parent component
@@ -244,19 +86,25 @@ export function SettingsButton({ children }: { children: React.ReactNode }) {
 
 // Extract the form into a separate component for reuse
 function SettingsForm({ onClose }: { onClose: () => void }) {
-    // Load saved settings from localStorage if available
-    const savedSettings =
-        typeof window !== 'undefined'
-            ? JSON.parse(localStorage.getItem('translatorSettings') || '{}')
-            : {}
+    const store = useStore()
 
     const initialValues = {
         primaryLanguage:
-            savedSettings.primaryLanguage || defaultValues.primaryLanguage,
+            store.userPreferences.primaryLanguage ||
+            defaultValues.primaryLanguage,
         targetLanguage:
-            savedSettings.targetLanguage || defaultValues.targetLanguage,
-        openaiBase: savedSettings.openaiBase || defaultValues.openaiBase,
-        openaiKey: savedSettings.openaiKey || defaultValues.openaiKey,
+            store.userPreferences.targetLanguage ||
+            defaultValues.targetLanguage,
+        openaiBase:
+            store.userPreferences.openaiBase || defaultValues.openaiBase,
+        openaiKey: store.userPreferences.openaiKey || defaultValues.openaiKey,
+        smallModel:
+            store.userPreferences.smallModel || defaultValues.smallModel,
+        largeModel:
+            store.userPreferences.largeModel || defaultValues.largeModel,
+        alternativeLanguages:
+            store.userPreferences.alternativeLanguages ||
+            defaultValues.alternativeLanguages,
     }
 
     // Initialize the form with saved values
@@ -267,9 +115,7 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
 
     // Handle form submission
     function onSubmit(data: FormValues) {
-        // Save settings to localStorage
-        localStorage.setItem('translatorSettings', JSON.stringify(data))
-        console.log('Settings saved:', data)
+        store.setUserPreferences(data)
         onClose()
     }
 
@@ -345,6 +191,41 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                             </FormControl>
                             <FormDescription>
                                 Your OpenAI API key for translation services.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='smallModel'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Small Model</FormLabel>
+                            <FormControl>
+                                <Input
+                                    placeholder='e.g., gpt-3.5-turbo'
+                                    {...field}
+                                />
+                            </FormControl>
+                            <FormDescription>
+                                The small model for translation.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name='largeModel'
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Large Model</FormLabel>
+                            <FormControl>
+                                <Input placeholder='e.g., gpt-4o' {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                The large model for translation.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
