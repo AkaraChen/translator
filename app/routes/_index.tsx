@@ -34,7 +34,6 @@ export default function Index() {
     const store = useStore()
     const client = useOpenAI()
     const [targetLanguage, setTargetLanguage] = useState<Lang>(auto)
-    const [lockTargetLanguage, setLockTargetLanguage] = useState(false)
 
     const detectLang = useQuery({
         queryKey: ['detectLang', sourceText, store.userPreferences],
@@ -185,11 +184,14 @@ export default function Index() {
                                 size='icon'
                                 variant='outline'
                                 className='basis-9'
-                                onClick={() =>
-                                    setLockTargetLanguage(!lockTargetLanguage)
-                                }
+                                onClick={() => setTargetLanguage(auto)}
+                                disabled={targetLanguage === auto}
                             >
-                                {lockTargetLanguage ? <Lock /> : <LockOpen />}
+                                {targetLanguage !== auto ? (
+                                    <Lock />
+                                ) : (
+                                    <LockOpen />
+                                )}
                             </Button>
                         </div>
                     </div>
