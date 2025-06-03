@@ -37,7 +37,6 @@ export default function Index() {
         queryKey: [
             'detectLang',
             sourceText,
-            client,
             store.userPreferences,
         ],
         queryFn: () =>
@@ -54,7 +53,6 @@ export default function Index() {
             'translate',
             sourceText,
             detectLang.data,
-            client,
             store.userPreferences,
         ],
         queryFn: async () =>
