@@ -30,8 +30,8 @@ const queryClient = new QueryClient({
         queries: {
             refetchOnMount: false,
             refetchOnWindowFocus: false,
-        }
-    }
+        },
+    },
 })
 
 export function Layout({ children }: { children: React.ReactNode }) {

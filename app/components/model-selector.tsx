@@ -14,7 +14,7 @@ import {
 } from './ui/form'
 import { ControllerRenderProps } from 'react-hook-form'
 import { forwardRef, ReactNode } from 'react'
-import { useModels } from '~/requests/openai'
+import { useModels, Credentials } from '~/requests/openai'
 
 interface ModelSelectorProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -22,12 +22,13 @@ interface ModelSelectorProps {
     label: ReactNode
     description: ReactNode
     defaultValue?: string
+    credentials?: Credentials
 }
 
 const ModelSelector = forwardRef<HTMLSelectElement, ModelSelectorProps>(
     function (props, ref) {
-        const { field, label, description, defaultValue } = props
-        const models = useModels()
+        const { field, label, description, defaultValue, credentials } = props
+        const models = useModels(credentials)
         return (
             <FormItem>
                 <FormLabel>{label}</FormLabel>

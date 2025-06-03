@@ -213,6 +213,10 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                             label='Small Model'
                             description='The small model for language detection.'
                             defaultValue={field.value}
+                            credentials={{
+                                base: form.watch('openaiBase'),
+                                apiKey: form.watch('openaiKey'),
+                            }}
                         />
                     )}
                 />
@@ -225,6 +229,10 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                             label='Large Model'
                             description='The large model for translation.'
                             defaultValue={field.value}
+                            credentials={{
+                                base: form.watch('openaiBase'),
+                                apiKey: form.watch('openaiKey'),
+                            }}
                         />
                     )}
                 />
