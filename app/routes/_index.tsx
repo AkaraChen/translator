@@ -1,4 +1,4 @@
-import { TextareaHTMLAttributes, useMemo, useState } from 'react'
+import { TextareaHTMLAttributes, useState } from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
@@ -7,11 +7,11 @@ import { SettingsButton } from '~/components/settings-dialog'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { detectLanguage, translate } from '~/lib/translate'
 import useStore from '~/lib/store'
-import OpenAI from 'openai'
 import { toast } from 'sonner'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useCompositionInput } from 'foxact/use-composition-input'
 import { useClipboard } from 'foxact/use-clipboard'
+import { useOpenAI } from '~/requests/openai'
 
 export const meta: MetaFunction = () => {
     return [
@@ -21,9 +21,9 @@ export const meta: MetaFunction = () => {
 }
 
 export default function Index() {
-    const [sourceText, setSourceText] = useState('')
+    const [_sourceText, setSourceText] = useState('')
     const sourceTextAreaProps = useCompositionInput(v => setSourceText(v))
-    const debouncedSourceText = useDebounce(sourceText, 500)
+    const sourceText = useDebounce(_sourceText, 500)
     const { copy } = useClipboard({
         onCopyError(error) {
             toast.error(`Failed to copy text, ${error.message}`)
@@ -31,21 +31,18 @@ export default function Index() {
     })
 
     const store = useStore()
-    const client = useMemo(
-        () =>
-            new OpenAI({
-                baseURL: store.userPreferences.openaiBase,
-                apiKey: store.userPreferences.openaiKey,
-                dangerouslyAllowBrowser: true,
-            }),
-        [store.userPreferences.openaiBase, store.userPreferences.openaiKey],
-    )
+    const client = useOpenAI()
 
     const detectLang = useQuery({
-        queryKey: ['detectLang', debouncedSourceText],
+        queryKey: [
+            'detectLang',
+            sourceText,
+            client,
+            store.userPreferences,
+        ],
         queryFn: () =>
             detectLanguage({
-                text: debouncedSourceText,
+                text: sourceText,
                 userPreferences: store.userPreferences,
                 client,
             }),
@@ -53,11 +50,17 @@ export default function Index() {
     })
 
     const handleTranslate = useQuery({
-        queryKey: ['translate', debouncedSourceText, detectLang.data],
+        queryKey: [
+            'translate',
+            sourceText,
+            detectLang.data,
+            client,
+            store.userPreferences,
+        ],
         queryFn: async () =>
             translate(
                 {
-                    text: debouncedSourceText,
+                    text: sourceText,
                     userPreferences: store.userPreferences,
                     client,
                 },
