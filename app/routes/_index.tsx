@@ -21,6 +21,9 @@ export const meta: MetaFunction = () => {
     ]
 }
 
+const auto = Symbol('auto')
+type Lang = typeof auto | string
+
 export default function Index() {
     const [_sourceText, setSourceText] = useState('')
     const sourceTextAreaProps = useCompositionInput(v => setSourceText(v))
@@ -32,9 +35,7 @@ export default function Index() {
     })
     const store = useStore()
     const client = useOpenAI()
-    const [targetLanguage, setTargetLanguage] = useState(
-        store.userPreferences.targetLanguage,
-    )
+    const [targetLanguage, setTargetLanguage] = useState<Lang>(auto)
     const [lockTargetLanguage, setLockTargetLanguage] = useState(false)
 
     const detectLang = useQuery({
@@ -64,10 +65,10 @@ export default function Index() {
                     client,
                 },
                 detectLang.data!,
-                targetLanguage,
+                targetLanguage === auto ? undefined : targetLanguage,
             ).finally(() => {
                 if (!lockTargetLanguage) {
-                    setTargetLanguage(store.userPreferences.targetLanguage)
+                    setTargetLanguage(auto)
                 }
             }),
         enabled: !!detectLang.data && !!sourceText,
@@ -167,13 +168,18 @@ export default function Index() {
                         </div>
                         <div className='flex items-center space-x-3'>
                             <LanguageSelector
-                                value={targetLanguage}
+                                value={
+                                    targetLanguage === auto
+                                        ? 'auto'
+                                        : targetLanguage
+                                }
                                 onValueChange={setTargetLanguage}
                                 className='w-32'
                                 disabled={
                                     detectLang.isLoading ||
                                     handleTranslate.isLoading
                                 }
+                                enableAuto
                             />
                             <Button
                                 size='icon'
