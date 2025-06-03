@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { TextareaHTMLAttributes, useMemo, useState } from 'react'
 import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
@@ -10,17 +10,25 @@ import useStore from '~/lib/store'
 import OpenAI from 'openai'
 import { toast } from 'sonner'
 import { useDebounce } from '@uidotdev/usehooks'
+import { useCompositionInput } from 'foxact/use-composition-input'
+import { useClipboard } from 'foxact/use-clipboard'
 
 export const meta: MetaFunction = () => {
     return [
-        { title: 'Translator - Translation Tool' },
+        { title: 'Translator' },
         { name: 'description', content: 'A simple translation tool' },
     ]
 }
 
 export default function Index() {
     const [sourceText, setSourceText] = useState('')
+    const sourceTextAreaProps = useCompositionInput(v => setSourceText(v))
     const debouncedSourceText = useDebounce(sourceText, 500)
+    const { copy } = useClipboard({
+        onCopyError(error) {
+            toast.error(`Failed to copy text, ${error.message}`)
+        },
+    })
 
     const store = useStore()
     const client = useMemo(
@@ -105,8 +113,10 @@ export default function Index() {
                                 id='source'
                                 placeholder='Enter text to translate...'
                                 className='min-h-[300px] resize-none'
-                                value={sourceText}
-                                onChange={e => setSourceText(e.target.value)}
+                                {...(sourceTextAreaProps as unknown as Partial<
+                                    TextareaHTMLAttributes<HTMLTextAreaElement>
+                                >)}
+                                defaultValue={sourceText}
                             />
                         </div>
                     </div>
@@ -141,7 +151,7 @@ export default function Index() {
                 <div className='space-x-3'>
                     <Button
                         disabled={!handleTranslate.data}
-                        onClick={() => navigator.clipboard.writeText(handleTranslate.data!)}
+                        onClick={() => copy(handleTranslate.data!)}
                     >
                         Copy
                     </Button>

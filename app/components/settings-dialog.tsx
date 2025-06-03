@@ -204,7 +204,7 @@ function SettingsForm({ onClose }: { onClose: () => void }) {
                         <ModelSelector
                             field={field}
                             label='Small Model'
-                            description='The small model for translation.'
+                            description='The small model for language detection.'
                             defaultValue={field.value}
                         />
                     )}
