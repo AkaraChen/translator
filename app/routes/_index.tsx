@@ -169,7 +169,11 @@ export default function Index() {
                             <LanguageSelector
                                 value={targetLanguage}
                                 onValueChange={setTargetLanguage}
-                                className='flex-1'
+                                className='w-32'
+                                disabled={
+                                    detectLang.isLoading ||
+                                    handleTranslate.isLoading
+                                }
                             />
                             <Button
                                 size='icon'
