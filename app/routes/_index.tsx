@@ -13,6 +13,7 @@ import { useCompositionInput } from 'foxact/use-composition-input'
 import { useClipboard } from 'foxact/use-clipboard'
 import { useOpenAI } from '~/requests/openai'
 import LanguageSelector from '~/components/language-selector'
+import { auto, Lang } from '~/lib/lang'
 
 export const meta: MetaFunction = () => {
     return [
@@ -20,9 +21,6 @@ export const meta: MetaFunction = () => {
         { name: 'description', content: 'A simple translation tool' },
     ]
 }
-
-const auto = Symbol('auto')
-type Lang = typeof auto | string
 
 export default function Index() {
     const [_sourceText, setSourceText] = useState('')

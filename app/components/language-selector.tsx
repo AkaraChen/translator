@@ -7,20 +7,7 @@ import {
     SelectValue,
 } from './ui/select'
 import { ControllerRenderProps } from 'react-hook-form'
-
-const langs = [
-    'Chinese',
-    'English',
-    'French',
-    'German',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Portuguese',
-    'Russian',
-    'Spanish',
-    'Vietnamese',
-]
+import { langs } from '~/lib/lang'
 
 interface LanguageSelectorProps extends SelectProps {
     className?: string
