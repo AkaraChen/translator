@@ -21,7 +21,6 @@ export const meta: MetaFunction = () => {
 export default function Index() {
     const [sourceText, setSourceText] = useState('')
     const debouncedSourceText = useDebounce(sourceText, 500)
-    const [targetText, setTargetText] = useState('')
 
     const store = useStore()
     const client = useMemo(
@@ -45,8 +44,9 @@ export default function Index() {
         enabled: !!sourceText,
     })
 
-    const handleTranslate = useMutation({
-        mutationFn: async () =>
+    const handleTranslate = useQuery({
+        queryKey: ['translate', debouncedSourceText, detectLang.data],
+        queryFn: async () =>
             translate(
                 {
                     text: debouncedSourceText,
@@ -55,12 +55,7 @@ export default function Index() {
                 },
                 detectLang.data!,
             ),
-        onSuccess: data => {
-            setTargetText(data || 'unknown error')
-        },
-        onError: err => {
-            toast.error(`Failed to translate text, ${err.message}`)
-        },
+        enabled: !!detectLang.data && !!sourceText,
     })
 
     const handlePaste = useMutation({
@@ -72,11 +67,6 @@ export default function Index() {
             toast.error(`Failed to read clipboard contents, ${err.message}`)
         },
     })
-
-    const handleClear = () => {
-        setSourceText('')
-        setTargetText('')
-    }
 
     return (
         <div className='container mx-auto px-4 py-8'>
@@ -132,9 +122,15 @@ export default function Index() {
                             </label>
                             <Textarea
                                 id='target'
-                                placeholder='Translation will appear here...'
+                                placeholder={
+                                    detectLang.isLoading
+                                        ? 'Detecting language...'
+                                        : handleTranslate.isLoading
+                                          ? 'Translating...'
+                                          : 'Translation will appear here...'
+                                }
                                 className='min-h-[300px] resize-none'
-                                value={targetText}
+                                value={handleTranslate.data || ''}
                                 readOnly
                             />
                         </div>
@@ -144,19 +140,16 @@ export default function Index() {
                 {/* Buttons row */}
                 <div className='space-x-3'>
                     <Button
-                        onClick={() => handleTranslate.mutate()}
-                        disabled={!detectLang.data || handleTranslate.isPending}
+                        disabled={!handleTranslate.data}
+                        onClick={() => navigator.clipboard.writeText(handleTranslate.data!)}
                     >
-                        Translate
+                        Copy
                     </Button>
                     <Button
                         variant='outline'
                         onClick={() => handlePaste.mutate()}
                     >
                         Paste
-                    </Button>
-                    <Button variant='secondary' onClick={handleClear}>
-                        Clear
                     </Button>
                 </div>
             </div>
