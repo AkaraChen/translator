@@ -3,6 +3,7 @@ import type { MetaFunction } from '@remix-run/node'
 import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { Settings } from 'lucide-react'
+import { SettingsButton } from '~/components/settings-dialog'
 
 export const meta: MetaFunction = () => {
     return [
@@ -47,9 +48,11 @@ export default function Index() {
                             A simple translation tool
                         </p>
                     </div>
-                    <Button variant='ghost' size='icon' aria-label='Settings'>
-                        <Settings className='!size-5' />
-                    </Button>
+                    <SettingsButton>
+                        <Button variant='ghost' size='icon' aria-label='Settings'>
+                            <Settings className='!size-5' />
+                        </Button>
+                    </SettingsButton>
                 </div>
 
                 <div className='flex flex-col gap-4 md:flex-row'>
