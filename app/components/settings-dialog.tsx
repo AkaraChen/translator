@@ -184,7 +184,7 @@ export function SettingsButton({ children }: { children: React.ReactNode }) {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent className='sm:max-w-[425px]'>
+            <DialogContent className='sm:max-w-[500px]'>
                 <DialogHeader>
                     <DialogTitle>Settings</DialogTitle>
                     <DialogDescription>
