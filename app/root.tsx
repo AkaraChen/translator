@@ -25,7 +25,14 @@ export const links: LinksFunction = () => [
     },
 ]
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false,
+        }
+    }
+})
 
 export function Layout({ children }: { children: React.ReactNode }) {
     return (
