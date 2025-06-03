@@ -86,7 +86,7 @@ export default function Index() {
                             Translator
                         </h1>
                         <p className='hidden text-center text-muted-foreground md:block'>
-                            A simple translation tool
+                            A simple translation tool.
                         </p>
                     </div>
                     <SettingsButton>
