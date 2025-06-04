@@ -13,6 +13,7 @@ import LanguageSelector from '~/components/language-selector'
 import { auto, Lang } from '~/lib/lang'
 import { Badge } from '~/components/badge'
 import { useDetectLang, useTranslate } from '~/requests/translate'
+import useStore from '~/lib/store'
 
 export const meta: MetaFunction = () => {
     return [
@@ -46,6 +47,8 @@ export default function Index() {
             toast.error(`Failed to read clipboard contents, ${err.message}`)
         },
     })
+
+    const store = useStore()
 
     return (
         <div className='container mx-auto px-4 py-8'>
@@ -122,6 +125,19 @@ export default function Index() {
                                 className='text-sm font-medium'
                             >
                                 Translated Text
+                                {targetLanguage === auto &&
+                                    sourceText &&
+                                    detectLang.data && (
+                                        <Badge className='ml-2'>
+                                            {detectLang.data ===
+                                            store.userPreferences
+                                                .primaryLanguage
+                                                ? store.userPreferences
+                                                      .targetLanguage
+                                                : store.userPreferences
+                                                      .primaryLanguage}
+                                        </Badge>
+                                    )}
                             </label>
                             <Textarea
                                 id='target'
