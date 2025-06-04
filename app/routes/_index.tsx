@@ -4,16 +4,15 @@ import { Button } from '~/components/ui/button'
 import { Textarea } from '~/components/ui/textarea'
 import { Lock, LockOpen, Settings } from 'lucide-react'
 import { SettingsButton } from '~/components/settings-dialog'
-import { useMutation, useQuery } from '@tanstack/react-query'
-import { detectLanguage, translate } from '~/lib/translate'
-import useStore from '~/lib/store'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useCompositionInput } from 'foxact/use-composition-input'
 import { useClipboard } from 'foxact/use-clipboard'
-import { useOpenAI } from '~/requests/openai'
 import LanguageSelector from '~/components/language-selector'
 import { auto, Lang } from '~/lib/lang'
+import { Badge } from '~/components/badge'
+import { useDetectLang, useTranslate } from '~/requests/translate'
 
 export const meta: MetaFunction = () => {
     return [
@@ -24,48 +23,19 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
     const [_sourceText, setSourceText] = useState('')
-    const sourceTextAreaProps = useCompositionInput(v => setSourceText(v))
+    const sourceTextAreaProps = useCompositionInput(v =>
+        setSourceText(v),
+    ) as unknown as TextareaHTMLAttributes<HTMLTextAreaElement>
     const sourceText = useDebounce(_sourceText, 500)
     const { copy } = useClipboard({
         onCopyError(error) {
             toast.error(`Failed to copy text, ${error.message}`)
         },
     })
-    const store = useStore()
-    const client = useOpenAI()
     const [targetLanguage, setTargetLanguage] = useState<Lang>(auto)
 
-    const detectLang = useQuery({
-        queryKey: ['detectLang', sourceText, store.userPreferences],
-        queryFn: () =>
-            detectLanguage({
-                text: sourceText,
-                userPreferences: store.userPreferences,
-                client,
-            }),
-        enabled: !!sourceText,
-    })
-
-    const handleTranslate = useQuery({
-        queryKey: [
-            'translate',
-            sourceText,
-            detectLang.data,
-            store.userPreferences,
-            targetLanguage === auto ? undefined : targetLanguage,
-        ],
-        queryFn: () =>
-            translate(
-                {
-                    text: sourceText,
-                    userPreferences: store.userPreferences,
-                    client,
-                },
-                detectLang.data!,
-                targetLanguage === auto ? undefined : targetLanguage,
-            ),
-        enabled: !!detectLang.data && !!sourceText,
-    })
+    const detectLang = useDetectLang(sourceText)
+    const translate = useTranslate(sourceText, detectLang.data!, targetLanguage)
 
     const handlePaste = useMutation({
         mutationFn: () => navigator.clipboard.readText(),
@@ -109,21 +79,29 @@ export default function Index() {
                                 className='text-sm font-medium'
                             >
                                 Source Text
+                                {detectLang.data && (
+                                    <Badge className='ml-2'>
+                                        {detectLang.data}
+                                    </Badge>
+                                )}
+                                {detectLang.isLoading && (
+                                    <Badge className='ml-2 animate-pulse opacity-50'>
+                                        Detecting
+                                    </Badge>
+                                )}
                             </label>
                             <Textarea
                                 id='source'
                                 placeholder='Enter text to translate...'
                                 className='min-h-[300px] resize-none'
-                                {...(sourceTextAreaProps as unknown as Partial<
-                                    TextareaHTMLAttributes<HTMLTextAreaElement>
-                                >)}
+                                {...sourceTextAreaProps}
                                 defaultValue={sourceText}
                             />
                         </div>
                         <div className='space-x-3'>
                             <Button
-                                disabled={!handleTranslate.data}
-                                onClick={() => copy(handleTranslate.data!)}
+                                disabled={!translate.data}
+                                onClick={() => copy(translate.data!)}
                             >
                                 Copy
                             </Button>
@@ -150,12 +128,12 @@ export default function Index() {
                                 placeholder={
                                     detectLang.isLoading
                                         ? 'Detecting language...'
-                                        : handleTranslate.isLoading
+                                        : translate.isLoading
                                           ? 'Translating...'
                                           : 'Translation will appear here...'
                                 }
                                 className='min-h-[300px] resize-none'
-                                value={handleTranslate.data || ''}
+                                value={translate.data || ''}
                                 readOnly
                             />
                         </div>
@@ -175,8 +153,7 @@ export default function Index() {
                                 }}
                                 className='w-32'
                                 disabled={
-                                    detectLang.isLoading ||
-                                    handleTranslate.isLoading
+                                    detectLang.isLoading || translate.isLoading
                                 }
                                 enableAuto
                             />
