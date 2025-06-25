@@ -1,40 +1,9 @@
-# Welcome to Remix!
+# AI Translator
 
-- 📖 [Remix docs](https://remix.run/docs)
+This project offers an intuitive interface for AI translation, designed for a smooth user experience. You can set your "native language" and a "primary foreign language."
 
-## Development
+**Key Features:**
 
-Run the dev server:
-
-```sh
-npm run dev
-```
-
-## Deployment
-
-First, build your app for production:
-
-```sh
-npm run build
-```
-
-Then run the app in production mode:
-
-```sh
-npm start
-```
-
-Now you'll need to pick a host to deploy it to.
-
-### DIY
-
-If you're familiar with deploying Node applications, the built-in Remix app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-- `build/server`
-- `build/client`
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever css framework you prefer. See the [Vite docs on css](https://vitejs.dev/guide/features.html#css) for more information.
+- **Effortless Translation:** Most of the time, you'll translate between your set "native language" and "primary foreign language" without needing to constantly adjust settings.
+- **Smart Direction Detection:** When you paste content in your "native language," it will automatically be translated to your "primary foreign language." Conversely, if content is pasted in your "primary foreign language," it will be translated back to your "native language."
+- **Simplified Interface:** Designed for quick and efficient translation, minimizing unnecessary interactions.
